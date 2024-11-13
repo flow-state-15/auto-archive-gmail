@@ -4,85 +4,74 @@ async function runScript() {
 		const start = Date.now();
 		while (Date.now() - start < time) {}
 	};
-	const simClick = (element) => {
-		const mup = new MouseEvent("mouseup", {
-			bubbles: true,
-			cancelable: true,
-			view: window,
-			clientX: element.getBoundingClientRect().x,
-			clientY: element.getBoundingClientRect().y,
+	const simClick = async (element) => {
+		return new Promise((resolve, reject) => {
+			const mup = new MouseEvent("mouseup", {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+				clientX: element.getBoundingClientRect().x,
+				clientY: element.getBoundingClientRect().y,
+			});
+			const mdown = new MouseEvent("mousedown", {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+				clientX: element.getBoundingClientRect().x,
+				clientY: element.getBoundingClientRect().y,
+			});
+			const d1 = element.dispatchEvent(mdown);
+			const d2 = element.dispatchEvent(mup);
+			element.click();
+			resolve("simClick")
 		});
-		const mdown = new MouseEvent("mousedown", {
-			bubbles: true,
-			cancelable: true,
-			view: window,
-			clientX: element.getBoundingClientRect().x,
-			clientY: element.getBoundingClientRect().y,
-		});
-		const d1 = element.dispatchEvent(mdown);
-		const d2 = element.dispatchEvent(mup);
-		element.click();
-		if (!d1 || !d2) {
-			return false;
-		} else {
-			return true;
-		}
 	};
 	const selectAll = async () => {
-		try {
-			new Promise((resolve, reject) => {
-				setTimeout(() => {
-					const pageSelect = document.querySelector(
-						'span[jslog="170807; u014N:cOuCgd,Kr2w4b;"]'
-					);
-					if (pageSelect) {
-						pageSelect.click();
-					} else {
-						console.log("didnt find checkbox, aborting");
-						reject("didnt find checkbox, aborting");
-					}
-					if (pageSelect.getAttribute("aria-checked")) {
-						console.log("checked");
-						resolve(true);
-					} else {
-						console.log("not checked, aborting");
-						reject("not checked, aborting");
-					}
-				}, 250);
-			});
-		} catch (e) {
-			console.error("selectall failed, error: ", e);
-		}
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				const pageSelect = document.querySelector(
+					'span[jslog="170807; u014N:cOuCgd,Kr2w4b;"]'
+				);
+				if (pageSelect) {
+					pageSelect.click();
+				} else {
+					reject("didnt find checkbox, aborting");
+				}
+				if (pageSelect.getAttribute("aria-checked")) {
+					resolve("checked");
+				} else {
+					reject("not checked, aborting");
+				}
+			}, 250);
+		});
 	};
 
 	const runArchive = async () => {
-		try {
-			new Promise((resolve, reject) => {
-				const archive = document.querySelector("div[aria-label='Archive']");
-				if (!archive) {
-					console.log("archive not found, aborting");
-					reject("archive not found, aborting");
-				}
-				setTimeout(() => {
-					resolve(simClick(archive));
-				}, 250);
-			});
-		} catch (e) {
-			console.error("runarchive failed, e: ", e);
-		}
+		return new Promise((resolve, reject) => {
+			const archive = document.querySelector("div[aria-label='Archive']");
+			if (!archive) {
+				reject("archive not found, aborting");
+			}
+			setTimeout(() => {
+				resolve("running sim click on archive");
+			}, 250);
+		});
 	};
 
-	const findForward = new Promise((resolve, reject) => {
-		const forward = document.querySelector(
-			'div[jslog="126439; u014N:cOuCgd,Kr2w4b"][aria-label="Older"]'
-		);
-		if (!forward || forward.getAttribute("aria-disabled") === "true") {
-			console.log("forward not found, aborting");
-			reject("forward not found, aborting");
-			return;
-		}
-		resolve(forward);
-	});
+	const findForward = async () => {
+		return new Promise((resolve, reject) => {
+			const forward = document.querySelector(
+				'div[jslog="126439; u014N:cOuCgd,Kr2w4b"][aria-label="Older"]'
+			);
+			if (!forward || forward.getAttribute("aria-disabled") === "true") {
+				console.log("forward not found, aborting");
+				reject(null);
+				return;
+			}
+			resolve(forward);
+		});
+	};
+	//!! FIX, PLS
 
 	while (await findForward()) {
 		selectAll();
@@ -100,3 +89,81 @@ async function runScript() {
 }
 
 runScript();
+
+async function testWhile(targetIters) {
+	const selectAll = async () => {
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				const pageSelect = document.querySelector(
+					'span[jslog="170807; u014N:cOuCgd,Kr2w4b;"]'
+				);
+				if (pageSelect) {
+					pageSelect.click();
+				} else {
+					reject("didnt find checkbox, aborting");
+				}
+				if (pageSelect.getAttribute("aria-checked")) {
+					resolve("checked");
+				} else {
+					reject("not checked, aborting");
+				}
+			}, 250);
+		});
+	};
+
+	const runArchive = async () => {
+		return new Promise((resolve, reject) => {
+			const archive = document.querySelector("div[aria-label='Archive']");
+			if (!archive) {
+				reject("archive not found, aborting");
+			}
+			setTimeout(() => {
+				resolve("running sim click on archive");
+			}, 250);
+		});
+	};
+    const simClick = async (element) => {
+		return new Promise((resolve, reject) => {
+			const mup = new MouseEvent("mouseup", {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+				clientX: element.getBoundingClientRect().x,
+				clientY: element.getBoundingClientRect().y,
+			});
+			const mdown = new MouseEvent("mousedown", {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+				clientX: element.getBoundingClientRect().x,
+				clientY: element.getBoundingClientRect().y,
+			});
+            setTimeout(() => {
+                const d1 = element.dispatchEvent(mdown);
+                const d2 = element.dispatchEvent(mup);
+                element.click();
+                resolve("simClick")
+            }, 1000)
+		});
+	};
+    const findForward = async () => {
+		return new Promise((resolve, reject) => {
+			const forward = document.querySelector(
+				'div[jslog="126439; u014N:cOuCgd,Kr2w4b"][aria-label="Older"]'
+			);
+			if (!forward || forward.getAttribute("aria-disabled") === "true") {
+				console.log("forward not found, aborting");
+				reject(null);
+				return;
+			}
+			resolve(forward);
+		});
+	};
+	let iters = 0;
+	while (iters <= targetIters) {
+		// await selectAll().then((r) => console.log(r));
+		// await runArchive().then((r) => console.log(r));
+        await findForward().then(r => simClick(r))
+		iters = iters + 1;
+	}
+}
